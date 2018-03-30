@@ -257,19 +257,7 @@ public class ContactsProvider {
             } else if (mimeType.equals(Event.CONTENT_ITEM_TYPE)) {
                 int eventType = cursor.getInt(cursor.getColumnIndex(Event.TYPE));
                 if (eventType == Event.TYPE_BIRTHDAY) {
-                    String birthday = cursor.getString(cursor.getColumnIndex(Event.START_DATE)).replace("--", "");
-                    String[] yearMonthDay = birthday.split("-");
-                    List<String> yearMonthDayList = Arrays.asList(yearMonthDay);
-                    if (yearMonthDayList.size() == 2) {
-                        int month = Integer.parseInt(yearMonthDayList.get(0));
-                        int day = Integer.parseInt(yearMonthDayList.get(1));
-                        contact.birthday = new Contact.Birthday(new Date(0).getYear(), month, day);
-                    } else {
-                        int year = Integer.parseInt(yearMonthDayList.get(0));
-                        int month = Integer.parseInt(yearMonthDayList.get(1));
-                        int day = Integer.parseInt(yearMonthDayList.get(2));
-                        contact.birthday = new Contact.Birthday(year, month, day);
-                    }
+                    constact.birthday = cursor.getString(cursor.getColumnIndex(Event.START_DATE));
                 }
             }
         }
@@ -311,12 +299,12 @@ public class ContactsProvider {
         private String company = "";
         private String jobTitle ="";
         private String department ="";
+        private String birthday = "";
         private boolean hasPhoto = false;
         private String photoUri;
         private List<Item> emails = new ArrayList<>();
         private List<Item> phones = new ArrayList<>();
         private List<PostalAddressItem> postalAddresses = new ArrayList<>();
-        private Birthday birthday;
 
 
         public Contact(String contactId) {
@@ -336,6 +324,7 @@ public class ContactsProvider {
             contact.putString("department", department);
             contact.putBoolean("hasThumbnail", this.hasPhoto);
             contact.putString("thumbnailPath", photoUri == null ? "" : photoUri);
+            contact.putString("birthday", birthday);
 
             WritableArray phoneNumbers = Arguments.createArray();
             for (Item item : phones) {
@@ -361,14 +350,6 @@ public class ContactsProvider {
             }
             contact.putArray("postalAddresses", postalAddresses);
 
-            WritableMap birthdayMap = Arguments.createMap();
-            if (birthday != null) {
-                birthdayMap.putInt("year", birthday.year);
-                birthdayMap.putInt("month", birthday.month);
-                birthdayMap.putInt("day", birthday.day);
-                contact.putMap("birthday", birthdayMap);
-            }
-
             return contact;
         }
 
@@ -379,18 +360,6 @@ public class ContactsProvider {
             public Item(String label, String value) {
                 this.label = label;
                 this.value = value;
-            }
-        }
-
-        public static class Birthday {
-            public int year = 0;
-            public int month = 0;
-            public int day = 0;
-
-            public Birthday(int year, int month, int day) {
-                this.year = year;
-                this.month = month;
-                this.day = day;
             }
         }
 
