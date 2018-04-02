@@ -257,7 +257,7 @@ public class ContactsProvider {
             } else if (mimeType.equals(Event.CONTENT_ITEM_TYPE)) {
                 int eventType = cursor.getInt(cursor.getColumnIndex(Event.TYPE));
                 if (eventType == Event.TYPE_BIRTHDAY) {
-                    constact.birthday = cursor.getString(cursor.getColumnIndex(Event.START_DATE));
+                    contact.birthday = cursor.getString(cursor.getColumnIndex(Event.START_DATE));
                 }
             }
         }
