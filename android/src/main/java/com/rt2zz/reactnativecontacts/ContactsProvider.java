@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import static android.provider.ContactsContract.CommonDataKinds.Contactables;
 import static android.provider.ContactsContract.CommonDataKinds.Email;
@@ -28,6 +29,12 @@ import static android.provider.ContactsContract.CommonDataKinds.StructuredPostal
 
 public class ContactsProvider {
     public static final int ID_FOR_PROFILE_CONTACT = -1;
+
+    private static final Map<String, String> DATA_TYPES = new java.util.HashMap<String, String>() {{
+        put("name", ContactsContract.Contacts.DISPLAY_NAME_PRIMARY);
+        put("jobTitle", Organization.TITLE);
+        put("company", Organization.COMPANY);
+    }};
 
     private static final List<String> JUST_ME_PROJECTION = new ArrayList<String>() {{
         add((ContactsContract.Data._ID));
@@ -81,13 +88,16 @@ public class ContactsProvider {
         this.contentResolver = contentResolver;
     }
 
-    public WritableArray getContactsMatchingString(String searchString) {
+    public WritableArray getContactsMatchingString(String searchString, String fieldName) {
+        String dataType = DATA_TYPES.get(fieldName);
+        if (dataType == null) return Arguments.createArray();
+
         Map<String, Contact> matchingContacts;
         {
             Cursor cursor = contentResolver.query(
                     ContactsContract.Data.CONTENT_URI,
                     FULL_PROJECTION.toArray(new String[FULL_PROJECTION.size()]),
-                    ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ?",
+                    dataType + " LIKE ?",
                     new String[]{"%" + searchString + "%"},
                     null
             );
@@ -108,7 +118,7 @@ public class ContactsProvider {
         return contacts;
     }
 
-     public WritableMap getContactByRawId(String contactRawId) {
+    public WritableMap getContactByRawId(String contactRawId) {
 
         // Get Contact Id from Raw Contact Id
         String[] projections = new String[]{ContactsContract.RawContacts.CONTACT_ID};

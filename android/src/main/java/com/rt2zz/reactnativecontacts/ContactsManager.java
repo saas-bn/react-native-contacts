@@ -96,8 +96,8 @@ public class ContactsManager extends ReactContextBaseJavaModule {
      * Returns all contacts matching string
      */
     @ReactMethod
-    public void getContactsMatchingString(final String searchString, final Callback callback) {
-        getAllContactsMatchingString(searchString, callback);
+    public void getContactsMatchingString(final String searchString, final String fieldName, final Callback callback) {
+        getAllContactsMatchingString(searchString, fieldName, callback);
     }
 
     /**
@@ -107,14 +107,14 @@ public class ContactsManager extends ReactContextBaseJavaModule {
      * @param searchString String to match
      * @param callback user provided callback to run at completion
      */
-    private void getAllContactsMatchingString(final String searchString, final Callback callback) {
+    private void getAllContactsMatchingString(final String searchString, final String fieldName, final Callback callback) {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
                 Context context = getReactApplicationContext();
                 ContentResolver cr = context.getContentResolver();
                 ContactsProvider contactsProvider = new ContactsProvider(cr);
-                WritableArray contacts = contactsProvider.getContactsMatchingString(searchString);
+                WritableArray contacts = contactsProvider.getContactsMatchingString(searchString, fieldName);
 
                 callback.invoke(null, contacts);
             }
