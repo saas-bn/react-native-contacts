@@ -100,6 +100,23 @@ public class ContactsManager extends ReactContextBaseJavaModule {
         getAllContactsMatchingString(searchString, callback);
     }
 
+    /*
+     * Returns all contacts matching phone number
+     */
+    @ReactMethod
+    public void getContactsByPhone(final String phoneNumber, final Callback callback) {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                Context context = getReactApplicationContext();
+                ContentResolver cr = context.getContentResolver();
+                ContactsProvider contactsProvider = new ContactsProvider(cr);
+                WritableArray contacts = contactsProvider.getContactsByPhone(phoneNumber);
+                callback.invoke(null, contacts);
+            }
+        });
+    }
+
     /**
      * Retrieves contacts matching String.
      * Uses raw URI when <code>rawUri</code> is <code>true</code>, makes assets copy otherwise.

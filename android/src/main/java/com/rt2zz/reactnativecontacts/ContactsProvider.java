@@ -108,6 +108,36 @@ public class ContactsProvider {
         return contacts;
     }
 
+    public WritableArray getContactsByPhone(String phoneNumber) {
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+        Map<String, Contact> matchingContacts;
+        {
+            Cursor cursor = contentResolver.query(
+                    uri,
+                    FULL_PROJECTION.toArray(new String[FULL_PROJECTION.size()]),
+                    null,
+                    null,
+                    null
+            );
+            if (cursor == null) {
+                return null;
+            }
+            try {
+                matchingContacts = loadContactsFrom(cursor);
+            } finally {
+                if (cursor != null && !cursor.isClosed()) {
+                    cursor.close();
+                }
+            }
+        }
+
+        WritableArray contacts = Arguments.createArray();
+        for (Contact contact : matchingContacts.values()) {
+            contacts.pushMap(contact.toMap());
+        }
+        return contacts;
+    }
+
      public WritableMap getContactByRawId(String contactRawId) {
 
         // Get Contact Id from Raw Contact Id
